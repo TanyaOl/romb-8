@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ромб і його властивості — інтерактивний урок</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef5f4;--grid:#cfe3e1;--sheet:#fdfefe;--ink:#1b2a41;--muted:#5b6b7f;--line:#d6e2e0;--margin:#f2a7a7;
+  --blue:#1d4ed8;--orange:#ea580c;--green:#15803d;--red:#dc2626;--purple:#7e22ce;
+  --fill:#dbeafe;--soft:#eaf1ff;--ok:#dcfce7;--bad:#fee2e2;--hl:#fff3b0;--note:#b45309;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1f2e;--grid:#17304a;--sheet:#14263a;--ink:#e7eef7;--muted:#9fb1c7;--line:#26405c;--margin:#7a3b46;
+    --blue:#7aa7ff;--orange:#ff9a55;--green:#5fdc8a;--red:#ff8080;--purple:#c79bff;
+    --fill:#1d3a63;--soft:#1a2f4d;--ok:#12391f;--bad:#4a1c1c;--hl:#5b4b12;--note:#ffc46b;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1f2e;--grid:#17304a;--sheet:#14263a;--ink:#e7eef7;--muted:#9fb1c7;--line:#26405c;--margin:#7a3b46;
+  --blue:#7aa7ff;--orange:#ff9a55;--green:#5fdc8a;--red:#ff8080;--purple:#c79bff;
+  --fill:#1d3a63;--soft:#1a2f4d;--ok:#12391f;--bad:#4a1c1c;--hl:#5b4b12;--note:#ffc46b;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);scroll-behavior:smooth}
+body{margin:0;font-family:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background-color:var(--bg);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;line-height:1.55;font-size:17px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+.wrap{max-width:860px;margin:0 auto;padding:0 14px 80px}
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--sheet);border-bottom:2px solid var(--blue);padding:8px 14px}
+.top-in{max-width:860px;margin:0 auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.top nav{display:flex;gap:6px;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none}
+.top nav::-webkit-scrollbar{display:none}
+.top nav a{white-space:nowrap;text-decoration:none;color:var(--ink);font-weight:700;font-size:14px;padding:5px 10px;border-radius:6px;border:1px solid var(--line)}
+.top nav a:hover{background:var(--soft)}
+.prog{font-weight:800;font-size:14px;white-space:nowrap;color:var(--green)}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;width:90px}
+.bar i{display:block;height:100%;width:0;background:var(--green);transition:width .3s}
+/* hero */
+.hero{padding:34px 0 10px}
+.hero h1{font-size:clamp(34px,7vw,56px);line-height:1.05;margin:0 0 8px;font-weight:800;letter-spacing:-.5px}
+.hero p{margin:0;color:var(--muted);font-size:18px;max-width:60ch}
+.hero .note{font-family:'Caveat',cursive;font-size:26px;color:var(--note);margin-top:10px}
+.hero svg{float:right;width:150px;margin:0 0 10px 16px}
+/* sheets */
+.sheet{background:var(--sheet);border:1px solid var(--line);border-left:3px solid var(--margin);border-radius:6px;padding:18px 18px 20px 22px;margin:22px 0;box-shadow:0 1px 0 var(--line)}
+.sheet h2{margin:0 0 4px;font-size:27px;line-height:1.15;font-weight:800}
+.sheet h3{margin:20px 0 6px;font-size:20px;font-weight:800}
+.lead{color:var(--muted);margin:0 0 12px}
+.def{background:var(--hl);border-radius:6px;padding:12px 14px;margin:12px 0;font-weight:700;font-size:18px}
+.def b{color:var(--blue)}
+.rule{border-left:4px solid var(--blue);background:var(--soft);padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0}
+.warn{border-left:4px solid var(--red);background:var(--bad);padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0}
+.good{border-left:4px solid var(--green);background:var(--ok);padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0}
+details.tip{margin:12px 0;border:1px dashed var(--note);border-radius:6px;padding:6px 12px;background:transparent}
+details.tip summary{cursor:pointer;font-family:'Caveat',cursive;font-size:23px;color:var(--note);font-weight:700}
+details.tip p,details.tip ul{margin:6px 0;font-size:16px}
+.k-blue{color:var(--blue);font-weight:800}.k-orange{color:var(--orange);font-weight:800}.k-green{color:var(--green);font-weight:800}.k-red{color:var(--red);font-weight:800}.k-purple{color:var(--purple);font-weight:800}
+/* figures */
+.figbox{display:flex;justify-content:center;margin:8px 0}
+svg.fig{width:100%;max-width:460px;height:auto;display:block}
+svg .lbl{font:800 14px 'Nunito',sans-serif;paint-order:stroke;stroke:var(--sheet);stroke-width:4px;stroke-linejoin:round}
+svg .vtx{font:800 17px 'Nunito',sans-serif;fill:var(--ink);paint-order:stroke;stroke:var(--sheet);stroke-width:4px}
+.cap{display:inline-block;background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:3px 10px;font-weight:800;font-size:15px;margin:4px 0}
+/* controls */
+.ctrl{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 18px;margin:10px 0}
+.ctrl label{display:block;font-weight:700;font-size:15px}
+.ctrl input[type=range]{width:100%;accent-color:var(--blue)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+button,.btn{font:inherit;font-weight:700;cursor:pointer;border-radius:6px;border:2px solid var(--blue);background:var(--sheet);color:var(--blue);padding:7px 13px;min-height:40px}
+button:hover{background:var(--soft)}
+button:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+button.on{background:var(--blue);color:var(--sheet)}
+button.pri{background:var(--blue);color:var(--sheet)}
+button.pri:hover{filter:brightness(1.1)}
+button:disabled{opacity:.45;cursor:default}
+button.ghost{border-color:var(--line);color:var(--ink)}
+.verdict{font-weight:800;padding:8px 12px;border-radius:6px;margin:6px 0}
+.verdict.yes{background:var(--ok);color:var(--green)}.verdict.no{background:var(--bad);color:var(--red)}
+.live{background:var(--soft);border-radius:6px;padding:8px 12px;font-weight:700;margin:6px 0;font-size:17px}
+/* tasks */
+.task{border:1px solid var(--line);border-radius:6px;padding:12px 14px;margin:16px 0;background:var(--sheet)}
+.task.done{border-color:var(--green);box-shadow:inset 4px 0 0 var(--green)}
+.th{display:flex;gap:10px;align-items:flex-start}
+.num{background:var(--blue);color:var(--sheet);font-weight:800;border-radius:6px;padding:2px 9px;white-space:nowrap}
+.q{font-weight:700}
+.arow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.arow input[type=text]{font:inherit;font-weight:700;border:2px solid var(--line);border-radius:6px;padding:7px 10px;background:var(--sheet);color:var(--ink);min-width:0;flex:1 1 170px;max-width:280px}
+.fb{font-weight:700;margin:4px 0;min-height:1px}
+.fb.ok{color:var(--green)}.fb.no{color:var(--red)}.fb.hint{color:var(--note)}
+ol.steps{margin:8px 0 4px;padding-left:24px}
+ol.steps li{margin:6px 0;padding:4px 8px;border-radius:6px}
+ol.steps li.now{background:var(--hl)}
+.res{font-weight:800;color:var(--green);background:var(--ok);padding:6px 10px;border-radius:6px;margin-top:6px}
+.lvl{display:inline-block;font-weight:800;font-size:13px;padding:2px 9px;border-radius:99px;background:var(--soft);border:1px solid var(--line)}
+/* shapes game */
+.shapes{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:10px 0}
+.shape{border:2px solid var(--line);border-radius:6px;padding:6px;text-align:center;cursor:pointer;background:var(--sheet);font:inherit;color:var(--ink)}
+.shape.sel{border-color:var(--blue);background:var(--soft)}
+.shape.ok{border-color:var(--green);background:var(--ok)}.shape.no{border-color:var(--red);background:var(--bad)}
+.shape svg{width:100%;height:auto;max-height:90px}
+.shape small{display:block;font-weight:700;margin-top:2px}
+.shape .why{font-size:13px;font-weight:600;color:var(--muted)}
+/* mcq / tf */
+.mq{margin:14px 0;padding:10px 12px;border:1px solid var(--line);border-radius:6px}
+.mq .qq{font-weight:800;margin-bottom:6px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opts button{text-align:left;border-color:var(--line);color:var(--ink)}
+.opts button.right{background:var(--ok);border-color:var(--green)}
+.opts button.wrong{background:var(--bad);border-color:var(--red)}
+.tf{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center;margin:12px 0;padding:10px;border:1px solid var(--line);border-radius:6px}
+.tf svg{width:110px;height:auto}
+@media (max-width:520px){.tf{grid-template-columns:1fr}.hero svg{width:100px}}
+table.cheat{border-collapse:collapse;width:100%;font-size:16px}
+table.cheat td,table.cheat th{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+table.cheat th{background:var(--soft)}
+.algo{counter-reset:a;list-style:none;padding:0;margin:8px 0}
+.algo li{counter-increment:a;margin:6px 0;padding:8px 12px 8px 44px;position:relative;background:var(--soft);border-radius:6px}
+.algo li::before{content:counter(a);position:absolute;left:10px;top:7px;width:24px;height:24px;border-radius:50%;background:var(--blue);color:var(--sheet);font-weight:800;text-align:center;line-height:24px;font-size:14px}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="top-in">
+  <nav aria-label="Розділи уроку">
+    <a href="#s0">Розминка</a><a href="#s1">Означення</a><a href="#s2">Властивості 1–4</a><a href="#s3">Властивість 5</a><a href="#s4">Приклад 1</a><a href="#s5">Ознаки</a><a href="#s6">Практика</a><a href="#s7">Підсумок</a>
+  </nav>
+  <div class="bar" aria-hidden="true"><i id="barfill"></i></div>
+  <div class="prog" id="prog">0 / 0</div>
+</div></div>
+
+<div class="wrap">
+
+<header class="hero">
+  <svg viewBox="0 0 150 110" aria-hidden="true">
+    <polygon points="20,95 95,95 130,20 55,20" fill="var(--fill)" fill-opacity=".6" stroke="var(--blue)" stroke-width="3" stroke-linejoin="round"/>
+    <line x1="20" y1="95" x2="130" y2="20" stroke="var(--orange)" stroke-width="3"/>
+    <line x1="55" y1="20" x2="95" y2="95" stroke="var(--orange)" stroke-width="3"/>
+  </svg>
+  <h1>Ромб і його властивості</h1>
+  <p>Геометрія, 8 клас, §4. Крок за кроком: що таке ромб, які в нього властивості, як їх бачити на малюнку й розв’язувати задачі.</p>
+  <div class="note">Не заучуємо — розглядаємо, крутимо повзунки й розуміємо.</div>
+</header>
+
+<details class="tip"><summary>👩‍🏫 Як вести урок</summary>
+<ul>
+<li>Блок за блоком: спочатку учень сам крутить повзунок і відповідає на запитання, і лише потім ви читаєте правило.</li>
+<li>У кожній задачі: учень вводить відповідь, а «підказка» і «розв’язання по кроках» відкриваються лише коли застряг. Малюнок будується разом із кроками.</li>
+<li>Не поспішайте до рівня 3. Слабкому учневі достатньо рівнів 1–2 і одного-двох прикладів із рівня 3.</li>
+</ul></details>
+
+<!-- 0 -->
+<section class="sheet" id="s0">
+<h2>0. Розминка: згадаємо паралелограм</h2>
+<p class="lead">Ромб — «родич» паралелограма. Спочатку перевіримо, що ти пам’ятаєш про паралелограм.</p>
+<div id="mq0"></div>
+</section>
+
+<!-- 1 -->
+<section class="sheet" id="s1">
+<h2>1. Що таке ромб?</h2>
+<div class="def"><b>Ромбом</b> називають паралелограм, у якого <b>всі сторони рівні</b>.</div>
+<p>Спробуй сам: міняй довжини сторін і кут. Коли паралелограм стає ромбом?</p>
+<div class="ctrl">
+  <label>Сторона AD = <span id="w1a">6</span> см<input type="range" id="r1a" min="3" max="9" value="6"></label>
+  <label>Сторона AB = <span id="w1b">4</span> см<input type="range" id="r1b" min="3" max="9" value="4"></label>
+  <label>Кут A = <span id="w1c">65</span>°<input type="range" id="r1c" min="30" max="90" value="65"></label>
+</div>
+<div class="figbox" id="f1"></div>
+<div id="v1"></div>
+<div class="good"><b>Запам’ятай:</b> сусідні сторони рівні ⇒ усі чотири рівні, бо в паралелограма протилежні сторони й так рівні. Квадрат теж ромб (усі сторони рівні й кути прямі), а ось прямокутник із різними сторонами — ні.</div>
+
+<h3>Завдання 4.1 (усно)</h3>
+<p>Які з чотирикутників є ромбами? Познач усі, які вважаєш ромбами, і натисни «Перевірити».</p>
+<div class="shapes" id="shapes"></div>
+<div class="arow"><button class="pri" id="shChk">Перевірити</button></div>
+<div class="fb" id="shFb"></div>
+<details class="tip"><summary>👩‍🏫 Запитання учневі</summary><p>«Що спільного в усіх ромбів на малюнку?» (усі сторони рівні). «Чому квадрат — ромб?». Не підказуйте, нехай міркує вголос.</p></details>
+</section>
+
+<!-- 2 -->
+<section class="sheet" id="s2">
+<h2>2. Властивості 1–4: ромб успадкував їх від паралелограма</h2>
+<p class="lead">Ромб — паралелограм, тому має <b>всі</b> властивості паралелограма. Обери властивість, потім крути повзунок і дивись, як змінюються числа.</p>
+<div class="tabs" id="t2"></div>
+<div class="ctrl">
+  <label>Кут A = <span id="w2c">65</span>°<input type="range" id="r2c" min="30" max="90" value="65"></label>
+  <label>Сторона a = <span id="w2a">5</span> см<input type="range" id="r2a" min="3" max="9" value="5"></label>
+</div>
+<div class="figbox" id="f2"></div>
+<div class="live" id="l2"></div>
+<div class="rule" id="r2"></div>
+<details class="tip"><summary>👩‍🏫 Запитання учневі</summary><p>«Що буде з кутом B, якщо кут A збільшити?» «Чи може в ромба бути два тупі кути поруч?» (ні, їхня сума була б більшою за 180°).</p></details>
+</section>
+
+<!-- 3 -->
+<section class="sheet" id="s3">
+<h2>3. Властивість 5: діагоналі ромба</h2>
+<div class="def">Діагоналі ромба <b>взаємно перпендикулярні</b> й <b>ділять його кути навпіл</b>.</div>
+<p>Це головна «фішка» ромба. У паралелограма так не буває. Покрути кут і подивись:</p>
+<div class="ctrl">
+  <label>Кут A = <span id="w3c">64</span>°<input type="range" id="r3c" min="30" max="90" value="64"></label>
+</div>
+<div class="figbox" id="f3"></div>
+<div class="live" id="l3"></div>
+<h3>Чому так? Доведення по кроках</h3>
+<div id="p3"></div>
+<div class="good"><b>Як користуватися в задачах:</b> щойно в умові є діагональ ромба, пиши: «діагональ ділить кут навпіл» і «діагоналі перпендикулярні». Дві фрази — і половина задачі розв’язана.</div>
+</section>
+
+<!-- 4 -->
+<section class="sheet" id="s4">
+<h2>4. Розбираємо приклад 1 із підручника</h2>
+<p class="lead">Спочатку спробуй сам, потім дивись розв’язання.</p>
+<div id="ex1"></div>
+</section>
+
+<!-- 5 -->
+<section class="sheet" id="s5">
+<h2>5. Ознаки ромба</h2>
+<p class="lead">Властивість відповідає на запитання «що має ромб?». Ознака навпаки: «як зрозуміти, що це ромб?».</p>
+<div class="rule"><b>Теорема (ознаки ромба).</b> Якщо в паралелограмі: 1) дві сусідні сторони рівні, або 2) діагоналі перетинаються під прямим кутом, або 3) діагональ ділить навпіл кути паралелограма, — то паралелограм є ромбом.</div>
+<div class="warn"><b>Увага:</b> усі три ознаки працюють лише для <b>паралелограма</b>. Чотирикутник із перпендикулярними діагоналями без цієї умови ромбом може не бути (дивись задачу 4.22 нижче).</div>
+<div class="tabs" id="t5"></div>
+<div id="p5"></div>
+<h3>Приклад 2 із підручника</h3>
+<div id="ex2"></div>
+</section>
+
+<!-- 6 -->
+<section class="sheet" id="s6">
+<h2>6. Практика: задачі з підручника</h2>
+<div class="rule"><b>Алгоритм для задач про кути ромба:</b>
+<ol class="algo">
+<li>Намалюй ромб і познач те, що дано.</li>
+<li>Проведи діагоналі, якщо про них щось сказано. Вони ділять кути навпіл і перпендикулярні.</li>
+<li>Виділи трикутник, у якому знаєш два кути, і знайди третій (сума кутів трикутника 180°).</li>
+<li>Пам’ятай: сусідні кути ромба дають 180°, протилежні рівні, а всі сторони рівні.</li>
+</ol></div>
+
+<h3><span class="lvl">Рівень 1</span> Сторони, периметр, половинки кутів</h3>
+<div id="g1"></div>
+
+<h3><span class="lvl">Рівень 2</span> Кути ромба</h3>
+<div id="g2"></div>
+<h3>Задача 4.22 (усно): правда чи ні?</h3>
+<div id="tf"></div>
+
+<h3><span class="lvl">Рівень 3</span> Складніші задачі</h3>
+<p class="lead">Беремося, коли рівні 1–2 виходять без підказок.</p>
+<div id="g3"></div>
+
+<h3><span class="lvl">Побудови</span> Задачі 4.2, 4.3, 4.25, 4.26</h3>
+<div class="rule">
+<p><b>4.2 і 4.3.</b> Ромб із тупим кутом B — це те саме, що ромб із гострим кутом A (бо ∠A + ∠B = 180°). Будуємо: 1) відрізок AD; 2) від променя AD відкладаємо гострий кут, наприклад 60°; 3) на промені відкладаємо AB = AD; 4) із точок B і D циркулем малюємо дуги радіусом AD, їх перетин — точка C; 5) з’єднуємо B–C і C–D.</p>
+<p><b>4.25 (1) за стороною й діагоналлю.</b> Будуємо △ABD за трьома сторонами (AB = AD = a, BD = d). Далі з точок B і D дугами радіуса a знаходимо C.</p>
+<p><b>4.25 (2) за діагоналями.</b> Проводимо перпендикулярні прямі, позначаємо O. Від O відкладаємо половини діагоналей у обидва боки на кожній прямій, з’єднуємо 4 точки.</p>
+<p><b>4.26 за стороною й кутом.</b> Будуємо кут, відкладаємо на його сторонах відрізки, рівні заданій стороні, і добудовуємо четверту вершину дугами.</p>
+</div>
+</section>
+
+<!-- 7 -->
+<section class="sheet" id="s7">
+<h2>7. Підсумок</h2>
+<h3>Перевір себе</h3>
+<div id="mq7"></div>
+<h3>Шпаргалка</h3>
+<table class="cheat">
+<tr><th>Що</th><th>Правило</th></tr>
+<tr><td>Означення</td><td>Паралелограм із рівними сторонами</td></tr>
+<tr><td>Сторони й периметр</td><td>AB = BC = CD = DA, P = 4a</td></tr>
+<tr><td>Кути</td><td>Сусідні: сума 180°. Протилежні рівні.</td></tr>
+<tr><td>Діагоналі</td><td>Діляться навпіл у точці O, перпендикулярні, ділять кути навпіл</td></tr>
+<tr><td>Ознаки</td><td>Паралелограм + (дві сусідні сторони рівні, або діагоналі ⊥, або діагональ ділить кут навпіл)</td></tr>
+<tr><td>Квадрат</td><td>Прямокутник із рівними сторонами, тобто й ромб теж</td></tr>
+</table>
+<div class="good" style="margin-top:14px">Далі за підручником: §5 «Квадрат і його властивості». Вправи 4.33–4.42 (складніші й повторення) можна залишити як додаткові.</div>
+</section>
+
+</div>
+
+<script>
+'use strict';
+const R=Math.PI/180;
+const col={blue:'var(--blue)',orange:'var(--orange)',green:'var(--green)',red:'var(--red)',purple:'var(--purple)',ink:'var(--ink)',muted:'var(--muted)'};
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1]], add=(a,b)=>[a[0]+b[0],a[1]+b[1]], mul=(a,k)=>[a[0]*k,a[1]*k];
+const len=a=>Math.hypot(a[0],a[1]);
+const norm=a=>{const l=len(a)||1;return [a[0]/l,a[1]/l]};
+const f1=n=>Math.round(n*10)/10;
+
+function foot(p,a,b){const dx=b[0]-a[0],dy=b[1]-a[1];const t=((p[0]-a[0])*dx+(p[1]-a[1])*dy)/(dx*dx+dy*dy);return [a[0]+t*dx,a[1]+t*dy];}
+function geo(al,s,b){
+  const c=Math.cos(al*R),sn=Math.sin(al*R);
+  const p={A:[0,0],D:[s,0],B:[b*c,b*sn],C:[s+b*c,b*sn]};
+  p.O=[(p.A[0]+p.C[0])/2,(p.A[1]+p.C[1])/2];
+  p.K=[p.B[0],0];p.M=p.K;
+  p.N=foot(p.B,p.C,p.D);
+  p.L=[p.D[0],p.B[1]];
+  p.P=foot(p.A,p.B,p.C);
+  p.Q=foot(p.A,p.C,p.D);
+  p.E=[s*1.35,0];
+  return p;
+}
+
+/* mark helpers */
+const S=(p,q,l,c='blue')=>({t:'side',p,q,l,c});
+const A=(v,a,b,l,c='green',r)=>({t:'ang',v,a,b,l,c,r});
+const G=(p,q,c='orange',d=false,w)=>({t:'seg',p,q,c,d,w});
+const RT=(v,a,b)=>({t:'right',v,a,b});
+const H=(pts,c='purple')=>({t:'hl',pts,c});
+const PT=p=>({t:'pt',p});
+const EQ=(p,q,n=1,c='orange')=>({t:'eq',p,q,n,c});
+const DIAG=()=>[G('A','C'),G('B','D')];
+
+function fig(al,marks,o={}){
+  const s=o.s||100,b=o.b||s;
+  const pts=geo(al,s,b);
+  const need=new Set(['A','B','C','D']);
+  marks.forEach(m=>{['p','q','v','a','b'].forEach(k=>{if(m[k]&&pts[m[k]])need.add(m[k])});(m.pts||[]).forEach(x=>need.add(x));});
+  let xs=[],ys=[];need.forEach(k=>{xs.push(pts[k][0]);ys.push(pts[k][1]);});
+  const pad=38,minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
+  const w=Math.max(maxx-minx,1),h=Math.max(maxy-miny,1);
+  const sc=Math.min(2.2,(430-2*pad)/w,(260-2*pad)/h);
+  const W=w*sc+2*pad,H=h*sc+2*pad;
+  const T=k=>{const p=typeof k==='string'?pts[k]:k;return [(p[0]-minx)*sc+pad,(maxy-p[1])*sc+pad];};
+  const cen=T('O');
+  const out=(pt,d)=>add(pt,mul(norm(sub(pt,cen)),d));
+  const f=n=>n.toFixed(1);
+  let svg=`<svg class="fig" viewBox="0 0 ${f(W)} ${f(H)}" role="img" aria-label="Малюнок ромба">`;
+  svg+=`<polygon points="${['A','B','C','D'].map(k=>T(k).map(f).join(',')).join(' ')}" fill="var(--fill)" fill-opacity=".55" stroke="var(--blue)" stroke-width="2.5" stroke-linejoin="round"/>`;
+  /* side ticks */
+  const eqSides=Math.abs(b-s)<1e-6;
+  if(o.ticks!==false){
+    [['A','D',1],['B','C',1],['A','B',eqSides?1:2],['C','D',eqSides?1:2]].forEach(([p,q,n])=>{svg+=ticks(T(p),T(q),n,'var(--blue)');});
+  }
+  function ticks(a,b2,n,c){
+    const m=[(a[0]+b2[0])/2,(a[1]+b2[1])/2],d=norm(sub(b2,a)),pn=[-d[1],d[0]];
+    let r='';
+    for(let i=0;i<n;i++){const off=(i-(n-1)/2)*5;const cc=add(m,mul(d,off));
+      r+=`<line x1="${f(cc[0]-pn[0]*6)}" y1="${f(cc[1]-pn[1]*6)}" x2="${f(cc[0]+pn[0]*6)}" y2="${f(cc[1]+pn[1]*6)}" stroke="${c}" stroke-width="2.2"/>`;}
+    return r;
+  }
+  /* dedupe keyed marks */
+  const map=new Map();let u=0;
+  marks.forEach(m=>{let key;if(m.t==='side')key='s'+[m.p,m.q].sort().join('');else if(m.t==='ang')key='a'+m.v+m.a+m.b;else key='u'+(u++);map.set(key,m);});
+  const labels=[];
+  map.forEach(m=>{
+    const c=col[m.c]||m.c||col.ink;
+    if(m.t==='hl'){svg+=`<polygon points="${m.pts.map(k=>T(k).map(f).join(',')).join(' ')}" fill="${c}" fill-opacity=".22" stroke="${c}" stroke-width="1.5" stroke-opacity=".7"/>`;}
+  });
+  map.forEach(m=>{
+    const c=col[m.c]||m.c||col.ink;
+    if(m.t==='seg'){const a=T(m.p),b2=T(m.q);svg+=`<line x1="${f(a[0])}" y1="${f(a[1])}" x2="${f(b2[0])}" y2="${f(b2[1])}" stroke="${c}" stroke-width="${m.w||2.6}" ${m.d?'stroke-dasharray="6 5"':''} stroke-linecap="round"/>`;}
+    else if(m.t==='eq'){svg+=ticks(T(m.p),T(m.q),m.n||1,c);}
+    else if(m.t==='right'){const v=T(m.v),ua=norm(sub(T(m.a),v)),ub=norm(sub(T(m.b),v));const p1=add(v,mul(ua,11)),p3=add(v,mul(ub,11)),p2=add(p1,mul(ub,11));
+      svg+=`<path d="M${f(p1[0])},${f(p1[1])} L${f(p2[0])},${f(p2[1])} L${f(p3[0])},${f(p3[1])}" fill="none" stroke="var(--ink)" stroke-width="2"/>`;
+      if(m.l){const bis=norm(add(ua,ub));const lp=add(v,mul(bis,27));labels.push([lp,m.l,'var(--ink)']);}}
+    else if(m.t==='ang'){const v=T(m.v),ua=norm(sub(T(m.a),v)),ub=norm(sub(T(m.b),v));const r=m.r||24;
+      const p1=add(v,mul(ua,r)),p2=add(v,mul(ub,r));const cr=ua[0]*ub[1]-ua[1]*ub[0];const sw=cr>0?1:0;
+      svg+=`<path d="M${f(v[0])},${f(v[1])} L${f(p1[0])},${f(p1[1])} A${r},${r} 0 0 ${sw} ${f(p2[0])},${f(p2[1])} Z" fill="${c}" fill-opacity=".2" stroke="${c}" stroke-width="2.2"/>`;
+      let bis=add(ua,ub);bis=len(bis)<1e-6?[-ua[1],ua[0]]:norm(bis);
+      const lp=add(v,mul(bis,r+(m.l&&m.l.length>3?24:15)));labels.push([lp,m.l,c]);}
+    else if(m.t==='side'){const a=T(m.p),b2=T(m.q);const mid=[(a[0]+b2[0])/2,(a[1]+b2[1])/2];const lp=out(mid,17);labels.push([lp,m.l,c]);}
+    else if(m.t==='pt'){const p=T(m.p);svg+=`<circle cx="${f(p[0])}" cy="${f(p[1])}" r="3.6" fill="var(--ink)"/>`;const lp=out(p,14);labels.push([lp,m.p,'var(--ink)','vtx']);}
+    else if(m.t==='txt'){labels.push([T(m.p),m.l,c]);}
+  });
+  ['A','B','C','D'].forEach(k=>{const p=out(T(k),15);labels.push([p,k,'var(--ink)','vtx']);});
+  if(need.has('O')){const p=T('O');svg+=`<circle cx="${f(p[0])}" cy="${f(p[1])}" r="3.4" fill="var(--ink)"/>`;labels.push([[p[0]+10,p[1]-8],'O','var(--ink)','vtx']);}
+  labels.forEach(([p,t,c,cl])=>{if(t!==undefined&&t!=='')svg+=`<text x="${f(p[0])}" y="${f(p[1])}" text-anchor="middle" dominant-baseline="central" class="${cl||'lbl'}" ${cl?'':`fill="${c}"`}>${t}</text>`;});
+  return svg+'</svg>';
+}
+
+/* ---------- progress ---------- */
+let solved=0,totalAns=0;
+function upd(){document.getElementById('prog').textContent=solved+' / '+totalAns;document.getElementById('barfill').style.width=(totalAns?solved/totalAns*100:0)+'%';}
+
+/* ---------- task / stepper ---------- */
+function mountTask(root,t){
+  root.className='task';
+  if(t.ans)totalAns++;
+  let k=0,done=false;
+  root.innerHTML=`<div class="th"><span class="num">${t.id}</span><div class="q">${t.q}</div></div>
+  ${t.cap?`<div class="cap">${t.cap}</div>`:''}
+  <div class="figbox"></div>
+  ${t.ans?`<div class="arow"><input type="text" inputmode="decimal" placeholder="Твоя відповідь (числа через кому)" aria-label="Відповідь ${t.id}"><button class="pri chk">Перевірити</button></div>`:''}
+  <div class="fb" aria-live="polite"></div>
+  <div class="arow">${t.hint?'<button class="ghost hnt">💡 Підказка</button>':''}<button class="nxt">▶ Показати розв’язання</button><button class="ghost rst">↺ Спочатку</button></div>
+  <ol class="steps"></ol><div class="resbox"></div>`;
+  const fb=root.querySelector('.fb'),figEl=root.querySelector('.figbox'),list=root.querySelector('.steps'),nxt=root.querySelector('.nxt'),rb=root.querySelector('.resbox');
+  function draw(){
+    const marks=[...(t.base||[])];for(let i=0;i<k;i++)marks.push(...t.steps[i][1]);
+    figEl.innerHTML=fig(t.al||60,marks,t.o||{});
+    list.innerHTML=t.steps.slice(0,k).map((s,i)=>`<li class="${i===k-1?'now':''}">${s[0]}</li>`).join('');
+    rb.innerHTML=(k===t.steps.length&&t.res)?`<div class="res">${t.res}</div>`:'';
+    nxt.textContent=k===0?'▶ Показати розв’язання':'▶ Наступний крок';
+    nxt.disabled=k>=t.steps.length;
+  }
+  nxt.onclick=()=>{k++;draw();};
+  root.querySelector('.rst').onclick=()=>{k=0;fb.textContent='';fb.className='fb';draw();};
+  const h=root.querySelector('.hnt');if(h)h.onclick=()=>{fb.className='fb hint';fb.textContent='💡 '+t.hint;};
+  const chk=root.querySelector('.chk');
+  if(chk){const inp=root.querySelector('input');
+    const go=()=>{
+      const nums=(inp.value.replace(/,/g,' ').match(/\d+(?:\.\d+)?/g)||[]).map(Number);
+      if(!nums.length){fb.className='fb no';fb.textContent='Впиши число (або числа через кому).';return;}
+      const uniq=[...new Set(nums)],exp=t.ans,extra=t.extra||[];
+      const ok=exp.every(x=>uniq.includes(x))&&uniq.every(x=>exp.includes(x)||extra.includes(x));
+      if(ok){fb.className='fb ok';fb.textContent='✅ Правильно! Подивись розв’язання — чи збігається хід думок?';if(!done){done=true;solved++;upd();root.classList.add('done');}}
+      else{fb.className='fb no';fb.textContent='Ще не так. Натисни «Підказка» або «Показати розв’язання» й спробуй ще раз.';}
+    };
+    chk.onclick=go;inp.addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+  }
+  draw();
+}
+function mountMany(id,list){const host=document.getElementById(id);list.forEach(t=>{const d=document.createElement('div');host.appendChild(d);mountTask(d,t);});}
+
+/* ---------- MCQ ---------- */
+function mountMCQ(id,qs){
+  const host=document.getElementById(id);
+  qs.forEach((q,qi)=>{
+    const d=document.createElement('div');d.className='mq';
+    d.innerHTML=`<div class="qq">${qi+1}. ${q.q}</div><div class="opts">${q.o.map((x,i)=>`<button data-i="${i}">${x}</button>`).join('')}</div><div class="fb"></div>`;
+    const fb=d.querySelector('.fb');let got=false;
+    d.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+      const i=+b.dataset.i;
+      if(i===q.ok){b.classList.add('right');fb.className='fb ok';fb.textContent='✅ '+q.why;}
+      else{b.classList.add('wrong');fb.className='fb no';fb.textContent='Спробуй ще раз.';}
+    });
+    host.appendChild(d);
+  });
+}
+
+/* ---------- 1. definition explorer ---------- */
+(function(){
+  const ra=document.getElementById('r1a'),rb=document.getElementById('r1b'),rc=document.getElementById('r1c');
+  function go(){
+    const a=+ra.value,b=+rb.value,c=+rc.value;
+    document.getElementById('w1a').textContent=a;document.getElementById('w1b').textContent=b;document.getElementById('w1c').textContent=c;
+    document.getElementById('f1').innerHTML=fig(c,[S('A','D',a+' см'),S('B','C',a+' см'),S('A','B',b+' см','orange'),S('C','D',b+' см','orange'),A('A','D','B',c+'°')],{s:a*20,b:b*20});
+    let v;
+    if(a===b){v=c===90?'✅ Усі сторони рівні й кути прямі: це квадрат. А квадрат теж ромб!':'✅ Усі сторони рівні ('+a+' см), тож це РОМБ.';}
+    else{v='❌ Сусідні сторони різні ('+a+' см і '+b+' см). Це звичайний '+(c===90?'прямокутник':'паралелограм')+', але не ромб. Зроби сторони рівними.';}
+    document.getElementById('v1').innerHTML=`<div class="verdict ${a===b?'yes':'no'}">${v}</div>`;
+  }
+  [ra,rb,rc].forEach(x=>x.addEventListener('input',go));go();
+})();
+
+/* ---------- 4.1 shapes ---------- */
+(function(){
+  const sh=[
+    {n:'мал. 4.4',pts:'60,8 112,50 60,92 8,50',ok:true,why:'Усі сторони рівні: ромб.'},
+    {n:'мал. 4.5',pts:'38,8 100,8 82,92 20,92',ok:false,why:'Сусідні сторони різні: паралелограм.'},
+    {n:'мал. 4.6',pts:'28,12 92,12 92,88 28,88',ok:true,why:'Квадрат: усі сторони рівні, тож ромб.'},
+    {n:'мал. 4.7',pts:'8,25 112,25 112,75 8,75',ok:false,why:'Сторони різні: прямокутник, не ромб.'},
+    {n:'мал. 4.8',pts:'60,4 106,50 60,96 14,50',ok:true,why:'Квадрат, повернутий на бік: ромб.'}
+  ];
+  const host=document.getElementById('shapes');const sel=new Set();
+  sh.forEach((s,i)=>{
+    const b=document.createElement('button');b.className='shape';b.type='button';
+    b.innerHTML=`<svg viewBox="0 0 120 100"><polygon points="${s.pts}" fill="var(--fill)" fill-opacity=".6" stroke="var(--blue)" stroke-width="3" stroke-linejoin="round"/></svg><small>${s.n}</small><span class="why"></span>`;
+    b.onclick=()=>{if(sel.has(i)){sel.delete(i);b.classList.remove('sel');}else{sel.add(i);b.classList.add('sel');}};
+    host.appendChild(b);
+  });
+  let counted=false;
+  document.getElementById('shChk').onclick=()=>{
+    let all=true;
+    [...host.children].forEach((b,i)=>{b.classList.remove('ok','no');const good=sh[i].ok===sel.has(i);if(!good)all=false;
+      b.classList.add(good?'ok':'no');b.querySelector('.why').textContent=sh[i].why;});
+    const fb=document.getElementById('shFb');
+    fb.className='fb '+(all?'ok':'no');
+    fb.textContent=all?'✅ Усе вірно: ромби — 4.4, 4.6 і 4.8.':'Дивись підписи під фігурами: перевір, у яких фігур усі сторони рівні. Зміни вибір і натисни ще раз.';
+  };
+})();
+
+/* ---------- 2. properties 1-4 ---------- */
+(function(){
+  const tabs=[
+   {n:'1. Сусідні кути',t:'Сума будь-яких двох сусідніх кутів ромба дорівнює 180°.'},
+   {n:'2. Протилежні кути',t:'У ромба протилежні кути рівні.'},
+   {n:'3. Діагоналі діляться навпіл',t:'Діагоналі ромба точкою перетину діляться навпіл.'},
+   {n:'4. Периметр',t:'Периметр ромба P = 4a, де a — сторона.'}
+  ];
+  let cur=0;const host=document.getElementById('t2');
+  tabs.forEach((x,i)=>{const b=document.createElement('button');b.textContent=x.n;b.onclick=()=>{cur=i;go();};host.appendChild(b);});
+  const rc=document.getElementById('r2c'),ra=document.getElementById('r2a');
+  function go(){
+    const c=+rc.value,a=+ra.value;
+    document.getElementById('w2c').textContent=c;document.getElementById('w2a').textContent=a;
+    [...host.children].forEach((b,i)=>b.classList.toggle('on',i===cur));
+    let m=[],live='';const B=180-c;
+    if(cur===0){m=[A('A','D','B','A = '+c+'°','green',26),A('B','A','C','B = '+B+'°','purple',26)];live=`∠A + ∠B = ${c}° + ${B}° = 180°`;}
+    if(cur===1){m=[A('A','D','B',c+'°','green'),A('C','B','D',c+'°','green'),A('B','A','C',B+'°','purple'),A('D','A','C',B+'°','purple')];live=`∠A = ∠C = ${c}°, ∠B = ∠D = ${B}°`;}
+    if(cur===2){m=[...DIAG(),EQ('A','O',1),EQ('O','C',1),EQ('B','O',2),EQ('O','D',2)];live='AO = OC і BO = OD. Дві рівні половинки на кожній діагоналі.';}
+    if(cur===3){m=[S('A','B',a+' см'),S('B','C',a+' см'),S('C','D',a+' см'),S('D','A',a+' см')];live=`P = 4 · ${a} = ${4*a} см`;}
+    document.getElementById('f2').innerHTML=fig(c,m);
+    document.getElementById('l2').textContent=live;
+    document.getElementById('r2').innerHTML='<b>Властивість '+(cur+1)+'.</b> '+tabs[cur].t;
+  }
+  rc.addEventListener('input',go);ra.addEventListener('input',go);go();
+})();
+
+/* ---------- 3. property 5 ---------- */
+(function(){
+  const rc=document.getElementById('r3c');
+  function go(){
+    const c=+rc.value,h=c/2,B=180-c,hb=B/2;
+    document.getElementById('w3c').textContent=c;
+    document.getElementById('f3').innerHTML=fig(c,[...DIAG(),RT('O','A','B'),A('A','D','O',f1(h)+'°','green'),A('A','O','B',f1(h)+'°','green'),A('B','A','O',f1(hb)+'°','purple'),A('B','O','C',f1(hb)+'°','purple')]);
+    document.getElementById('l3').innerHTML=`AC ⊥ BD (∠AOB = 90°)<br>Кут A = ${c}° ділиться на два по ${f1(h)}°. Кут B = ${B}° ділиться на два по ${f1(hb)}°.`;
+  }
+  rc.addEventListener('input',go);go();
+  mountTask(document.getElementById('p3').appendChild(document.createElement('div')),{
+    id:'Теорема',q:'Довести: діагоналі ромба перпендикулярні й діляться навпіл його кути.',al:64,
+    base:[],
+    steps:[
+     ['<b>Дано:</b> ABCD — ромб, AC і BD — діагоналі, O — точка їх перетину.',[...DIAG()]],
+     ['AB = AD (сторони ромба). Тому △ABD — <b>рівнобедрений</b> з основою BD.',[H(['A','B','D'],'blue')]],
+     ['Діагоналі ділять одна одну навпіл, тож BO = OD. Отже, AO — <b>медіана</b> до основи.',[EQ('B','O',2),EQ('O','D',2)]],
+     ['У рівнобедреному трикутнику медіана до основи є ще й <b>висотою</b> і <b>бісектрисою</b>.',[RT('O','A','B'),A('A','D','O','=','green'),A('A','O','B','=','green')]]
+    ],
+    res:'Тому AC ⊥ BD й ∠DAO = ∠BAO. Для решти кутів доводять так само. ∎'
+  });
+})();
+
+/* ---------- tasks data ---------- */
+const sides4=(l,c)=>[S('A','B',l,c),S('B','C',l,c),S('C','D',l,c),S('D','A',l,c)];
+
+mountTask(document.getElementById('ex1'),{
+  id:'Приклад 1',q:'Кут між висотою і діагоналлю ромба, проведеними з однієї вершини, дорівнює 28°. Знайти кути ромба.',al:56,
+  cap:'BK — висота, BD — діагональ, ∠KBD = 28°',ans:[124,56],
+  hint:'Розгляньте прямокутний трикутник BKD: знайдіть його гострий кут при вершині D. Потім згадайте, що діагональ ділить кут навпіл.',
+  base:[G('B','D'),G('B','K','blue'),RT('K','B','D'),PT('K'),A('B','K','D','28°','red')],
+  steps:[
+   ['△BKD — прямокутний (BK ⊥ AD). Сума гострих кутів 90°: ∠BDK = 90° − 28° = <b>62°</b>.',[H(['B','K','D']),A('D','A','B','62°','green')]],
+   ['DB — діагональ, вона ділить кут ADC навпіл: ∠ADC = 2 · 62° = <b>124°</b>.',[A('D','A','C','124°','purple',36)]],
+   ['Протилежні кути рівні: ∠ABC = ∠ADC = 124°. Сусідні дають 180°: ∠A = ∠C = 180° − 124° = <b>56°</b>.',[A('B','A','C','124°','purple',36),A('A','D','B','56°','green',30),A('C','B','D','56°','green',30)]]
+  ],
+  res:'Відповідь: 124°, 56°, 124°, 56°.'
+});
+
+/* proofs: signs */
+const signs=[
+ {n:'Ознака 1',t:{id:'Ознака 1',q:'Якщо в паралелограмі дві сусідні сторони рівні, то це ромб.',al:62,base:[],steps:[
+   ['<b>Дано:</b> ABCD — паралелограм, AB = AD.',[G('A','B','blue',false,4.5),G('A','D','blue',false,4.5)]],
+   ['У паралелограма протилежні сторони рівні: AB = CD, AD = BC.',[G('C','D','green',false,4.5),G('B','C','green',false,4.5)]]],
+   res:'Отже, AB = AD = BC = CD, усі сторони рівні, тож ABCD — ромб. ∎'}},
+ {n:'Ознака 2',t:{id:'Ознака 2',q:'Якщо діагоналі паралелограма перпендикулярні, то це ромб.',al:62,base:[],steps:[
+   ['<b>Дано:</b> ABCD — паралелограм, AC ⊥ BD.',[...DIAG(),RT('O','A','B')]],
+   ['У паралелограма діагоналі діляться навпіл: BO = OD.',[EQ('B','O',2),EQ('O','D',2)]],
+   ['△AOB = △AOD за двома катетами (AO — спільний, BO = OD, кути при O прямі).',[H(['A','O','B'],'blue'),H(['A','O','D'],'green')]]],
+   res:'Тому AB = AD. Паралелограм із рівними сусідніми сторонами — ромб (ознака 1). ∎'}},
+ {n:'Ознака 3',t:{id:'Ознака 3',q:'Якщо діагональ паралелограма ділить його кут навпіл, то це ромб.',al:62,base:[],steps:[
+   ['<b>Дано:</b> ABCD — паралелограм, BD ділить ∠D навпіл: ∠ADB = ∠BDC.',[G('B','D'),A('D','A','B','x','green'),A('D','B','C','x','green')]],
+   ['AB ∥ DC, BD — січна, тому ∠ABD = ∠BDC (внутрішні різносторонні).',[A('B','A','D','x','green')]],
+   ['Отже, ∠ADB = ∠ABD, і △ABD — рівнобедрений: AD = AB.',[H(['A','B','D'],'blue')]]],
+   res:'Паралелограм із рівними сусідніми сторонами — ромб (ознака 1). ∎'}}
+];
+(function(){
+  const host=document.getElementById('t5'),box=document.getElementById('p5');let cur=-1;
+  signs.forEach((s,i)=>{const b=document.createElement('button');b.textContent=s.n;b.onclick=()=>{
+    [...host.children].forEach((x,j)=>x.classList.toggle('on',i===j));
+    box.innerHTML='';const d=document.createElement('div');box.appendChild(d);mountTask(d,s.t);};host.appendChild(b);});
+  host.children[0].click();
+})();
+mountTask(document.getElementById('ex2'),{
+  id:'Приклад 2',q:'Довести: якщо в чотирикутнику всі сторони рівні, то цей чотирикутник — ромб.',al:62,
+  base:[],steps:[
+   ['<b>Дано:</b> AB = BC = CD = DA.',sides4('a')],
+   ['Протилежні сторони чотирикутника попарно рівні (AB = CD, BC = DA). За ознакою паралелограма ABCD — <b>паралелограм</b>.',[G('A','B','blue',false,4.5),G('C','D','blue',false,4.5),G('B','C','green',false,4.5),G('A','D','green',false,4.5)]],
+  ],
+  res:'У цього паралелограма сусідні сторони рівні, тож за ознакою ромба ABCD — ромб. ∎'
+});
+
+/* ---------- practice tasks ---------- */
+const G1=[
+ {id:'4.4',q:'Периметр ромба дорівнює 24 см. Знайдіть його сторону.',al:60,cap:'P = 24 см',ans:[6],
+  hint:'У ромба всі чотири сторони рівні. Периметр — це сума всіх сторін.',base:[S('A','B','a = ?','red')],
+  steps:[['Усі сторони ромба рівні. Позначимо сторону літерою <b>a</b>.',sides4('a')],
+   ['Периметр — сума всіх сторін: <b>P = a + a + a + a = 4a</b>.',[]],
+   ['4a = 24, тому a = 24 : 4 = <b>6 см</b>.',sides4('6 см','green')]],res:'Відповідь: 6 см.'},
+ {id:'4.5',q:'Сторона ромба дорівнює 4 дм. Знайдіть його периметр.',al:70,cap:'a = 4 дм',ans:[16],
+  hint:'P = 4a.',base:sides4('4 дм'),
+  steps:[['У ромба всі сторони по 4 дм.',[]],['P = 4 · 4 = <b>16 дм</b>.',[S('A','B','4 дм','blue')]]],res:'Відповідь: 16 дм.'},
+ {id:'4.12',q:'Сума довжин трьох сторін ромба дорівнює 21 см. Знайдіть його периметр.',al:70,cap:'AB + BC + CD = 21 см',ans:[28],
+  hint:'Скільки сторін у ромба? Усі вони рівні. Спочатку знайди одну сторону.',base:[S('A','B','a','blue'),S('B','C','a','blue'),S('C','D','a','blue')],
+  steps:[['Сторони рівні, тож три сторони: 3a = 21. Звідси a = 21 : 3 = <b>7 см</b>.',[S('A','B','7','green'),S('B','C','7','green'),S('C','D','7','green')]],
+   ['Четверта сторона теж 7 см: P = 4 · 7 = <b>28 см</b>.',[S('D','A','7','green')]]],res:'Відповідь: 28 см.'},
+ {id:'4.13',q:'Сума довжин двох сторін ромба дорівнює 16 см. Знайдіть периметр ромба.',al:70,cap:'AB + BC = 16 см',ans:[32],
+  hint:'Дві рівні сторони дають 16. Яка тоді одна сторона?',base:[S('A','B','a','blue'),S('B','C','a','blue')],
+  steps:[['Дві рівні сторони: 2a = 16, тому a = <b>8 см</b>.',[S('A','B','8','green'),S('B','C','8','green')]],
+   ['P = 4 · 8 = <b>32 см</b>.',sides4('8','green')]],res:'Відповідь: 32 см.'},
+ {id:'4.6',q:'Гострий кут ромба дорівнює 40°. Який кут утворює діагональ, проведена із цього кута, зі стороною ромба?',al:40,cap:'∠A = 40°, діагональ AC',ans:[20],
+  hint:'Діагональ ромба ділить його кут навпіл.',base:[A('A','D','B','40°','green',34)],
+  steps:[['Проводимо діагональ AC з вершини A. Вона <b>ділить кут навпіл</b>.',[G('A','C')]],
+   ['40° : 2 = <b>20°</b>.',[A('A','D','C','20°','red'),A('A','C','B','20°','red')]]],res:'Відповідь: 20°.'},
+ {id:'4.7',q:'Тупий кут ромба дорівнює 130°. Який кут утворює діагональ, проведена із цього кута, зі стороною ромба?',al:50,cap:'∠B = 130°, діагональ BD',ans:[65],
+  hint:'Діагональ ділить кут навпіл. Це правило працює і для тупого кута.',base:[A('B','A','C','130°','green',36)],
+  steps:[['Проводимо діагональ BD з вершини тупого кута B.',[G('B','D')]],['BD ділить ∠B навпіл: 130° : 2 = <b>65°</b>.',[A('B','A','D','65°','red'),A('B','D','C','65°','red')]]],res:'Відповідь: 65°.'},
+ {id:'4.8',q:'Діагональ ромба утворює зі стороною кут 60°. Знайдіть тупий кут ромба.',al:60,cap:'∠ABD = 60°, знайти тупий кут',ans:[120],
+  hint:'60° — це половина кута ромба (діагональ ділить кут навпіл). Який кут тоді весь?',base:[G('B','D'),A('B','A','D','60°','red')],
+  steps:[['Діагональ ділить кут навпіл, тож 60° — це <b>половина</b> кута.',[]],
+   ['Увесь кут: 2 · 60° = <b>120°</b>. Він більший за 90°, отже, тупий. (Половина гострого кута завжди менша за 45°, тому 60° — це половина тупого.)',[A('B','A','C','120°','purple',36)]]],res:'Відповідь: 120°.'},
+ {id:'4.9',q:'Діагональ ромба утворює зі стороною кут 20°. Знайдіть гострий кут ромба.',al:40,cap:'∠DAC = 20°, знайти гострий кут',ans:[40],
+  hint:'20° — половина кута, який утворює діагональ.',base:[G('A','C'),A('A','D','C','20°','red')],
+  steps:[['20° — половина кута A (діагональ ділить його навпіл).',[A('A','C','B','20°','red')]],['∠A = 2 · 20° = <b>40°</b>. Це гострий кут.',[A('A','D','B','40°','purple',38)]]],res:'Відповідь: 40°.'}
+];
+
+const G2=[
+ {id:'4.10',q:'У ромбі ABCD кут A дорівнює 36°. Знайдіть кути трикутника AOB, де O — точка перетину діагоналей.',al:36,cap:'∠A = 36°',ans:[18,72,90],
+  hint:'Діагоналі перпендикулярні, і AC ділить кут A навпіл.',base:[A('A','D','B','36°','muted',34)],
+  steps:[['Діагоналі ромба перпендикулярні: ∠AOB = <b>90°</b>.',[...DIAG(),RT('O','A','B'),H(['A','O','B'])]],
+   ['AC ділить кут A навпіл: ∠OAB = 36° : 2 = <b>18°</b>.',[A('A','O','B','18°','green')]],
+   ['Сума кутів трикутника 180°: ∠OBA = 180° − 90° − 18° = <b>72°</b>.',[A('B','A','O','72°','green')]]],res:'Відповідь: 18°, 72°, 90°.'},
+ {id:'4.11',q:'O — точка перетину діагоналей ромба ABCD, ∠B = 118°. Знайдіть кути трикутника BOC.',al:62,cap:'∠B = 118°',ans:[90,59,31],
+  hint:'Діагональ BD ділить кут B навпіл. Діагоналі перпендикулярні.',base:[A('B','A','C','118°','muted',38)],
+  steps:[['Діагоналі перпендикулярні: ∠BOC = <b>90°</b>.',[...DIAG(),RT('O','B','C'),H(['B','O','C'])]],
+   ['BD ділить ∠B навпіл: ∠OBC = 118° : 2 = <b>59°</b>.',[A('B','O','C','59°','green')]],
+   ['∠OCB = 180° − 90° − 59° = <b>31°</b>.',[A('C','B','O','31°','green')]]],res:'Відповідь: 90°, 59°, 31°.'},
+ {id:'4.14',q:'ABCD — ромб, ∠2 = 66° (мал. 4.9). Знайдіть ∠1.',al:66,cap:'∠2 = 66°',ans:[57],
+  hint:'∠2 — це кут C. Протилежний йому кут A такий самий. А ∠1 — половина кута B.',
+  base:[G('B','D'),G('D','E','ink',true),A('B','A','D','1','red'),A('C','B','D','2','blue')],
+  steps:[['∠2 — кут C ромба. Протилежні кути рівні: ∠A = ∠C = <b>66°</b>.',[A('A','D','B','66°','green',34)]],
+   ['Сусідні кути дають 180°: ∠ABC = 180° − 66° = <b>114°</b>.',[A('B','A','C','114°','purple',40)]],
+   ['BD ділить ∠B навпіл: ∠1 = 114° : 2 = <b>57°</b>.',[A('B','A','D','1 = 57°','green')]]],res:'Відповідь: 57°.'},
+ {id:'4.15',q:'ABCD — ромб, ∠1 = 58° (мал. 4.9). Знайдіть ∠2.',al:64,cap:'∠1 = 58°',ans:[64],
+  hint:'∠1 — половина кута B. Знайди кут B, потім сусідній кут C.',
+  base:[G('B','D'),G('D','E','ink',true),A('B','A','D','1','blue'),A('C','B','D','2','red')],
+  steps:[['BD ділить ∠B навпіл, тому ∠ABC = 2 · 58° = <b>116°</b>.',[A('B','A','C','116°','purple',40)]],
+   ['Сусідні кути дають 180°: ∠C = 180° − 116° = <b>64°</b>. Це й є ∠2.',[A('C','B','D','2 = 64°','green')]]],res:'Відповідь: 64°.'},
+ {id:'4.16',q:'ABCD — ромб, ∠1 = 55° (мал. 4.9). Знайдіть ∠3.',al:70,cap:'∠1 = 55°; ∠3 — кут між DC і продовженням AD',ans:[70],
+  hint:'∠3 і ∠ADC разом утворюють розгорнутий кут (180°).',
+  base:[G('B','D'),G('D','E','ink',true),A('B','A','D','1','blue'),A('D','E','C','3','red')],
+  steps:[['∠ABC = 2 · 55° = <b>110°</b> (діагональ ділить кут навпіл).',[A('B','A','C','110°','purple',40)]],
+   ['Протилежні кути рівні: ∠ADC = ∠ABC = <b>110°</b>.',[A('D','A','C','110°','purple',38)]],
+   ['A, D і E лежать на одній прямій, тому ∠3 = 180° − 110° = <b>70°</b>.',[A('D','E','C','3 = 70°','green')]]],res:'Відповідь: 70°.'},
+ {id:'4.17',q:'ABCD — ромб, ∠3 = 50° (мал. 4.9). Знайдіть ∠1.',al:50,cap:'∠3 = 50°',ans:[65],
+  hint:'Спершу знайди ∠ADC через розгорнутий кут.',
+  base:[G('B','D'),G('D','E','ink',true),A('B','A','D','1','red'),A('D','E','C','3','blue')],
+  steps:[['∠3 і ∠ADC разом дають 180°: ∠ADC = 180° − 50° = <b>130°</b>.',[A('D','A','C','130°','purple',38)]],
+   ['Протилежні кути рівні: ∠ABC = <b>130°</b>.',[A('B','A','C','130°','purple',40)]],
+   ['BD ділить ∠B навпіл: ∠1 = 130° : 2 = <b>65°</b>.',[A('B','A','D','1 = 65°','green')]]],res:'Відповідь: 65°.'},
+ {id:'4.18',q:'У ромбі ABCD AB = BD. Знайдіть кути ромба.',al:60,cap:'AB = BD',ans:[60,120],
+  hint:'Подумай, який вигляд має трикутник ABD, якщо в нього три однакові сторони.',base:[G('B','D','blue',false,3),EQ('B','D',1,'blue')],
+  steps:[['AB = AD (сторони ромба) і AB = BD (за умовою), отже, <b>AB = AD = BD</b>.',[H(['A','B','D'],'blue')]],
+   ['△ABD рівносторонній, усі його кути по 60°: ∠A = <b>60°</b>.',[A('A','D','B','60°','green')]],
+   ['∠A = ∠C = 60°, а ∠B = ∠D = 180° − 60° = <b>120°</b>.',[A('B','A','C','120°','purple',38),A('D','A','C','120°','purple',38),A('C','B','D','60°','green')]]],res:'Відповідь: 60°, 120°, 60°, 120°.'},
+ {id:'4.19',q:'(Усно.) Які спільні властивості мають ромб і паралелограм?',al:62,base:[],
+  steps:[['Протилежні сторони паралельні й рівні.',[G('A','D','blue',false,4.5),G('B','C','blue',false,4.5),G('A','B','green',false,4.5),G('C','D','green',false,4.5)]],
+   ['Протилежні кути рівні.',[A('A','D','B','=','green'),A('C','B','D','=','green'),A('B','A','C','⋆','purple'),A('D','A','C','⋆','purple')]],
+   ['Сума сусідніх кутів 180°.',[A('A','D','B','A','green',28),A('B','A','C','B','purple',28)]],
+   ['Діагоналі точкою перетину діляться навпіл.',[...DIAG(),EQ('A','O',1),EQ('O','C',1),EQ('B','O',2),EQ('O','D',2)]]],
+  res:'Ромб — паралелограм, тому має всі ці властивості. Додатково в ромба діагоналі перпендикулярні й ділять кути навпіл.'},
+ {id:'4.20 (1)',q:'Знайдіть кути ромба, якщо сума двох його кутів дорівнює 80°.',al:40,cap:'сума двох кутів = 80°',ans:[40,140],
+  hint:'Сума сусідніх кутів ромба 180°. А тут лише 80°. Які ж це кути тоді?',base:[],
+  steps:[['Сусідні кути дали б 180°, а в нас 80°. Тож це <b>протилежні</b> кути, вони рівні.',[]],
+   ['80° : 2 = <b>40°</b>: це гострі кути.',[A('A','D','B','40°','green'),A('C','B','D','40°','green')]],
+   ['Тупі кути: 180° − 40° = <b>140°</b>.',[A('B','A','C','140°','purple',36),A('D','A','C','140°','purple',36)]]],res:'Відповідь: 40°, 140°, 40°, 140°.'},
+ {id:'4.20 (2)',q:'Знайдіть кути ромба, якщо один із них на 20° більший за другий.',al:80,cap:'один кут на 20° більший',ans:[80,100],
+  hint:'Кути різні, тож вони сусідні. Нехай менший x, тоді більший x + 20. Їхня сума 180°.',base:[],
+  steps:[['Кути різні, значить, вони сусідні. Менший — x, більший — x + 20°.',[]],
+   ['x + (x + 20°) = 180°, 2x = 160°, x = <b>80°</b>.',[A('A','D','B','80°','green')]],
+   ['Більший кут: 80° + 20° = <b>100°</b>.',[A('B','A','C','100°','purple',36)]]],res:'Відповідь: 80°, 100°, 80°, 100°.'},
+ {id:'4.21 (1)',q:'Знайдіть кути ромба, якщо сума двох його кутів дорівнює 210°.',al:75,cap:'сума двох кутів = 210°',ans:[105,75],
+  hint:'Сусідні кути в сумі дають рівно 180°, а тут більше.',base:[],
+  steps:[['210° &gt; 180°, значить, це не сусідні, а <b>протилежні</b> (рівні) кути.',[]],
+   ['210° : 2 = <b>105°</b>: це тупі кути.',[A('B','A','C','105°','purple',36),A('D','A','C','105°','purple',36)]],
+   ['Гострі кути: 180° − 105° = <b>75°</b>.',[A('A','D','B','75°','green'),A('C','B','D','75°','green')]]],res:'Відповідь: 105°, 75°, 105°, 75°.'},
+ {id:'4.21 (2)',q:'Знайдіть кути ромба, якщо один із них на 50° менший від другого.',al:65,cap:'один кут на 50° менший',ans:[65,115],
+  hint:'Кути різні, тож сусідні. Менший x, більший x + 50°.',base:[],
+  steps:[['Нехай менший кут x, тоді більший x + 50°. Вони сусідні.',[]],
+   ['x + x + 50° = 180°, 2x = 130°, x = <b>65°</b>.',[A('A','D','B','65°','green')]],
+   ['Більший: 65° + 50° = <b>115°</b>.',[A('B','A','C','115°','purple',36)]]],res:'Відповідь: 65°, 115°, 65°, 115°.'}
+];
+
+const G3=[
+ {id:'4.23',q:'Знайдіть кути ромба, якщо його сторона утворює з діагоналями кути, різниця яких дорівнює 10°.',al:80,cap:'∠OBA − ∠OAB = 10°',ans:[80,100],
+  hint:'У △AOB кут O прямий, тому два інші кути дають 90°.',base:[...DIAG(),A('A','O','B','x','blue'),A('B','A','O','y','orange')],
+  steps:[['Діагоналі перпендикулярні, ∠AOB = 90°. У △AOB два інші кути в сумі 90°.',[RT('O','A','B'),H(['A','O','B'])]],
+   ['Нехай ∠OAB = x, тоді ∠OBA = x + 10°. x + x + 10° = 90°, x = <b>40°</b>, і другий кут <b>50°</b>.',[A('A','O','B','40°','green'),A('B','A','O','50°','purple')]],
+   ['Діагоналі ділять кути навпіл: ∠A = 2 · 40° = <b>80°</b>, ∠B = 2 · 50° = <b>100°</b>.',[]]],res:'Відповідь: 80°, 100°, 80°, 100°.'},
+ {id:'4.24',q:'Знайдіть кути ромба, якщо його сторона утворює з діагоналями кути, які відносяться як 2 : 3.',al:72,cap:'∠OAB : ∠OBA = 2 : 3',ans:[72,108],
+  hint:'Кути трикутника AOB: один прямий, два інші в сумі 90°. Запиши їх як 2k і 3k.',base:[...DIAG(),A('A','O','B','2k','blue'),A('B','A','O','3k','orange')],
+  steps:[['У △AOB: ∠O = 90°, тому два інші в сумі 90°.',[RT('O','A','B'),H(['A','O','B'])]],
+   ['2k + 3k = 90°, 5k = 90°, k = 18°. Кути: 2k = <b>36°</b> і 3k = <b>54°</b>.',[A('A','O','B','36°','green'),A('B','A','O','54°','purple')]],
+   ['Кути ромба вдвічі більші: ∠A = 72°, ∠B = 108°.',[]]],res:'Відповідь: 72°, 108°, 72°, 108°.'},
+ {id:'4.27',q:'У ромбі ABCD з вершини тупого кута B проведено висоти BM і BN. Доведіть, що BM = BN.',al:65,
+  base:[G('B','M','orange'),G('B','N','orange'),RT('M','B','D'),RT('N','B','C'),PT('M'),PT('N')],
+  steps:[['<b>Дано:</b> BM ⊥ AD, BN ⊥ CD. Розглянемо прямокутні трикутники ABM і CBN.',[H(['A','B','M'],'blue'),H(['C','B','N'],'green')]],
+   ['Гіпотенузи рівні: AB = BC (сторони ромба).',[EQ('A','B',1,'orange')]],
+   ['Гострі кути рівні: ∠A = ∠C (протилежні кути ромба).',[A('A','D','B','α','purple'),A('C','B','D','α','purple')]]],
+  res:'Прямокутні трикутники рівні за гіпотенузою й гострим кутом, тому BM = BN. ∎'},
+ {id:'4.28',q:'У ромбі ABCD з вершин тупих кутів проведено висоти BK і DL (BK ⊥ AD, DL ⊥ BC). Доведіть, що BK = DL.',al:65,
+  base:[G('B','K','orange'),G('D','L','orange'),RT('K','B','D'),RT('L','D','B'),PT('K'),PT('L')],
+  steps:[['AD ∥ BC (протилежні сторони ромба). BK ⊥ AD й DL ⊥ BC ⊥ AD, тобто <b>BK ∥ DL</b> (дві прямі, перпендикулярні до однієї прямої).',[]],
+   ['BL ∥ KD (бо BC ∥ AD) і BK ∥ DL. Тому BKDL — <b>паралелограм</b>.',[H(['B','L','D','K'],'purple')]]],
+  res:'У паралелограма протилежні сторони рівні, тож BK = DL. (Інакше: обидві висоти — відстань між паралельними прямими AD і BC.) ∎'},
+ {id:'4.29',q:'Висоти, проведені з вершини гострого кута ромба, утворюють між собою кут 110°. Знайдіть кути ромба.',al:70,cap:'кут між висотами AP і AQ = 110°',ans:[70,110],
+  hint:'Розглянь чотирикутник APCQ: у нього два прямі кути й кут 110°. Сума кутів чотирикутника 360°.',
+  base:[G('A','P','orange'),G('A','Q','orange'),G('B','P','ink',true),G('D','Q','ink',true),RT('P','A','B'),RT('Q','A','D'),PT('P'),PT('Q'),A('A','P','Q','110°','red',26)],
+  steps:[['Висоти з гострого кута A падають на <b>продовження</b> сторін CB і CD (пунктир): AP ⊥ BC, AQ ⊥ CD.',[]],
+   ['У чотирикутнику APCQ: ∠P = ∠Q = 90°, ∠PAQ = 110°. Сума кутів чотирикутника 360°.',[H(['A','P','C','Q'],'blue')]],
+   ['∠C = 360° − 90° − 90° − 110° = <b>70°</b>. Це гострий кут ромба.',[A('C','B','D','70°','green')]],
+   ['Тупий кут: 180° − 70° = <b>110°</b>.',[A('B','A','C','110°','purple',38)]]],res:'Відповідь: 70°, 110°, 70°, 110°.'},
+ {id:'4.30',q:'Висоти, проведені з вершини тупого кута ромба, утворюють між собою кут 50°. Знайдіть кути ромба.',al:50,cap:'∠MBN = 50°',ans:[50,130],
+  hint:'Розглянь чотирикутник BMDN: два прямі кути при M і N та кут 50° при B.',
+  base:[G('B','M','orange'),G('B','N','orange'),RT('M','B','D'),RT('N','B','C'),PT('M'),PT('N'),A('B','M','N','50°','red',26)],
+  steps:[['BM ⊥ AD, BN ⊥ CD. Розглянемо чотирикутник BMDN: ∠M = ∠N = 90°, ∠MBN = 50°.',[H(['B','M','D','N'],'blue')]],
+   ['∠D = 360° − 90° − 90° − 50° = <b>130°</b>. Це тупий кут ромба.',[A('D','A','C','130°','purple',34)]],
+   ['Гострий кут: 180° − 130° = <b>50°</b>.',[A('A','D','B','50°','green')]]],res:'Відповідь: 50°, 130°, 50°, 130°.'},
+ {id:'4.31',q:'Діагональ ромба, проведена з вершини тупого кута, утворює з висотою, проведеною із цієї самої вершини, кут 30°. Менша діагональ дорівнює a см. Знайдіть: 1) кути ромба; 2) периметр ромба.',al:60,cap:'∠KBD = 30°, BD = a',ans:[60,120],extra:[4],
+  hint:'Так само, як у прикладі 1: з прямокутного △BKD знайди ∠BDK, потім кут ромба. Для периметра придивися до △ABD.',
+  base:[G('B','D'),G('B','K','blue'),RT('K','B','D'),PT('K'),A('B','K','D','30°','red')],
+  steps:[['△BKD прямокутний: ∠BDK = 90° − 30° = <b>60°</b>.',[H(['B','K','D']),A('D','A','B','60°','green')]],
+   ['BD ділить ∠ADC навпіл: ∠ADC = 2 · 60° = <b>120°</b>, тоді ∠A = 180° − 120° = <b>60°</b>. Кути ромба: 60° і 120°.',[A('A','D','B','60°','green',34)]],
+   ['△ABD: AB = AD і ∠A = 60°, тому він рівносторонній: AB = BD = <b>a</b>.',[H(['A','B','D'],'blue'),S('A','B','a'),S('A','D','a')]],
+   ['Сторона ромба a, периметр <b>P = 4a</b> см.',[]]],res:'Відповідь: 1) 60°, 120°, 60°, 120°; 2) 4a см.'},
+ {id:'4.32',q:'У ромбі висота, проведена з вершини тупого кута, ділить сторону ромба навпіл. Знайдіть: 1) кути ромба; 2) периметр ромба, якщо його менша діагональ дорівнює b см.',al:60,cap:'AK = KD, BD = b',ans:[60,120],extra:[4],
+  hint:'У △ABD відрізок BK — і висота, і медіана. Яким тоді буде трикутник?',
+  base:[G('B','K','blue'),G('B','D','orange'),RT('K','B','D'),PT('K'),EQ('A','K',1,'green'),EQ('K','D',1,'green')],
+  steps:[['BK — висота й медіана △ABD (K — середина AD).',[H(['A','B','D'])]],
+   ['Якщо висота є й медіаною, трикутник рівнобедрений: <b>BA = BD</b>.',[S('B','D','b')]],
+   ['AB = AD (ромб). Отже, AB = AD = BD, △ABD рівносторонній, ∠A = <b>60°</b>. Кути ромба 60° і 120°.',[A('A','D','B','60°','green',34)]],
+   ['Сторона ромба дорівнює діагоналі b, тож P = <b>4b</b> см.',sides4('b')]],res:'Відповідь: 1) 60°, 120°, 60°, 120°; 2) 4b см.'}
+];
+
+mountMany('g1',G1);mountMany('g2',G2);mountMany('g3',G3);
+
+/* ---------- 4.22 true/false ---------- */
+(function(){
+  const kite='<svg viewBox="0 0 120 140"><polygon points="60,8 106,60 60,132 14,60" fill="var(--fill)" fill-opacity=".6" stroke="var(--blue)" stroke-width="3" stroke-linejoin="round"/><line x1="60" y1="8" x2="60" y2="132" stroke="var(--orange)" stroke-width="2.5"/><line x1="14" y1="60" x2="106" y2="60" stroke="var(--orange)" stroke-width="2.5"/><path d="M60,50 L70,50 L70,60" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>';
+  const sq='<svg viewBox="0 0 120 120"><polygon points="20,20 100,20 100,100 20,100" fill="var(--fill)" fill-opacity=".6" stroke="var(--blue)" stroke-width="3"/><path d="M20,90 L30,90 L30,100" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>';
+  const rect='<svg viewBox="0 0 120 120"><polygon points="8,30 112,30 112,90 8,90" fill="var(--fill)" fill-opacity=".6" stroke="var(--blue)" stroke-width="3"/></svg>';
+  const rh='<svg viewBox="0 0 120 120"><polygon points="60,6 114,60 60,114 6,60" fill="var(--fill)" fill-opacity=".6" stroke="var(--blue)" stroke-width="3"/><line x1="6" y1="60" x2="114" y2="60" stroke="var(--orange)" stroke-width="2.5"/><line x1="60" y1="6" x2="60" y2="114" stroke="var(--orange)" stroke-width="2.5"/></svg>';
+  const items=[
+   {s:kite,q:'1) Якщо в чотирикутнику діагоналі перпендикулярні, то він є ромбом.',a:false,w:'Ні. Це «повітряний змій»: діагоналі перпендикулярні, а сторони різні. Потрібно ще, щоб чотирикутник був паралелограмом (ознака 2).'},
+   {s:rh,q:'2) Якщо в чотирикутнику діагоналі не перпендикулярні, то він не може бути ромбом.',a:true,w:'Так. В ромба діагоналі завжди перпендикулярні (властивість 5), тож без цього ромбом бути не може.'},
+   {s:sq,q:'3) Існує ромб, який є прямокутником.',a:true,w:'Так. Квадрат: усі сторони рівні (ромб) і всі кути прямі (прямокутник).'},
+   {s:rect,q:'4) Жоден прямокутник не є ромбом.',a:false,w:'Ні. Квадрат — це прямокутник із рівними сторонами, тобто й ромб теж.'}
+  ];
+  const host=document.getElementById('tf');
+  items.forEach(it=>{
+    const d=document.createElement('div');d.className='tf';
+    d.innerHTML=`${it.s}<div><div class="q">${it.q}</div><div class="arow"><button data-v="1">Так</button><button data-v="0">Ні</button></div><div class="fb"></div></div>`;
+    const fb=d.querySelector('.fb');
+    d.querySelectorAll('button').forEach(b=>b.onclick=()=>{const v=b.dataset.v==='1';
+      if(v===it.a){fb.className='fb ok';fb.textContent='✅ '+it.w;}else{fb.className='fb no';fb.textContent='Подумай ще. Подивись на малюнок.';}});
+    host.appendChild(d);
+  });
+})();
+
+/* ---------- quizzes ---------- */
+mountMCQ('mq0',[
+ {q:'Чому дорівнює сума двох сусідніх кутів паралелограма?',o:['90°','180°','360°'],ok:1,why:'180°. Це знадобиться в кожній задачі про кути ромба.'},
+ {q:'Що відбувається з діагоналями паралелограма в точці перетину?',o:['Діляться навпіл','Завжди перпендикулярні','Рівні між собою'],ok:0,why:'Діляться навпіл. Це властивість усіх паралелограмів, а перпендикулярність буде лише в ромба.'},
+ {q:'Що можна сказати про протилежні сторони паралелограма?',o:['Вони паралельні й рівні','Вони перпендикулярні','Вони лише паралельні'],ok:0,why:'Паралельні й рівні. Ромб додає: сусідні сторони теж рівні.'}
+]);
+mountMCQ('mq7',[
+ {q:'Що таке ромб?',o:['Чотирикутник із прямими кутами','Паралелограм, у якого всі сторони рівні','Чотирикутник із двома рівними сторонами'],ok:1,why:'Так: паралелограм із рівними сторонами.'},
+ {q:'Сторона ромба 7 см. Його периметр:',o:['14 см','21 см','28 см'],ok:2,why:'P = 4 · 7 = 28 см.'},
+ {q:'Гострий кут ромба 50°. Діагональ із цієї вершини утворює зі стороною кут:',o:['25°','50°','65°'],ok:0,why:'Діагональ ділить кут навпіл: 50° : 2 = 25°.'},
+ {q:'Яке твердження — властивість діагоналей ромба?',o:['Вони рівні','Вони перпендикулярні й ділять кути навпіл','Вони паралельні'],ok:1,why:'Так, це властивість 5.'},
+ {q:'Який чотирикутник точно ромб?',o:['Паралелограм із перпендикулярними діагоналями','Чотирикутник із перпендикулярними діагоналями','Прямокутник'],ok:0,why:'Ознака 2 працює для паралелограма. Без цієї умови не можна.'},
+ {q:'Чи є квадрат ромбом?',o:['Так','Ні','Тільки якщо сторона 5 см'],ok:0,why:'Так: у квадрата всі сторони рівні.'}
+]);
+
+upd();
+</script>
+</body>
+</html>
